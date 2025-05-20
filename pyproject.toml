@@ -1,0 +1,88 @@
+[project]
+name = "gitingest"
+version = "0.1.4"
+description="CLI tool to analyze and create text dumps of codebases for LLMs"
+readme = {file = "README.md", content-type = "text/markdown" }
+requires-python = ">= 3.8"
+dependencies = [
+    "click>=8.0.0",
+    "fastapi[standard]>=0.109.1",  # Vulnerable to https://osv.dev/vulnerability/PYSEC-2024-38
+    "pydantic",
+    "python-dotenv",
+    "slowapi",
+    "starlette>=0.40.0",  # Vulnerable to https://osv.dev/vulnerability/GHSA-f96h-pmfr-66vw
+    "tiktoken",
+    "tomli",
+    "typing_extensions; python_version < '3.10'",
+    "uvicorn>=0.11.7",  # Vulnerable to https://osv.dev/vulnerability/PYSEC-2020-150
+    "boto3",
+]
+
+license = {file = "LICENSE"}
+authors = [{name = "Romain Courtois", email = "romain@coderamp.io"}]
+classifiers=[
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+[project.scripts]
+gitingest = "gitingest.cli:main"
+
+[project.urls]
+homepage = "https://gitingest.com"
+github = "https://github.com/cyclotruc/gitingest"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = {find = {where = ["src"]}}
+include-package-data = true
+
+# Linting configuration
+[tool.pylint.format]
+max-line-length = 119
+
+[tool.pylint.'MESSAGES CONTROL']
+disable = [
+    "too-many-arguments",
+    "too-many-positional-arguments",
+    "too-many-locals",
+    "too-few-public-methods",
+    "broad-exception-caught",
+    "duplicate-code",
+    "fixme",
+]
+
+[tool.pycln]
+all = true
+
+[tool.isort]
+profile = "black"
+line_length = 119
+remove_redundant_aliases = true
+float_to_top = true
+order_by_type = true
+filter_files = true
+
+[tool.black]
+line-length = 119
+
+# Test configuration
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests/"]
+python_files = "test_*.py"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+python_classes = "Test*"
+python_functions = "test_*"
