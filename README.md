@@ -2,21 +2,7 @@
 
 ![Frontpage](./docs/frontpage.png)
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/filiksyos/gittodoc/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/filiksyos/gittodoc?style=social.svg)](https://github.com/filiksyos/gittodoc)
-
-A tool to convert Git repositories into documentation.
-
-[GitHub Repository](https://github.com/filiksyos/gittodoc)
-
-## 🚀 Features
-
-- **Easy code context**: Get a text digest from a Git repository URL or a directory
-- **Smart Formatting**: Optimized output format for documentation
-- **Statistics about**:
-  - File and directory structure
-  - Size of the extract
-  - Token count
+A tool to convert Git repositories into documentation link.
 
 ## 📚 Requirements
 
