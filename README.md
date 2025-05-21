@@ -1,11 +1,8 @@
 # Gittodoc
 
-<video width="640" height="360" controls>
-  <source src="./docs/demo.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+https://github.com/user-attachments/assets/e2c8c6b4-1fb3-45b0-9396-16fba75462a0
 
-A tool to convert Git repositories into documentation link.
+A tool to convert Git repositories into documentation link that you can feed to AI coding tools like cursor.
 
 ## 📚 Requirements
 
