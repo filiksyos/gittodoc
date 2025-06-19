@@ -40,7 +40,8 @@ else:
     # Define the default allowed hosts for the application
     default_allowed_hosts = [
         "gitdocs.com", "*.gitdocs.com", "localhost", "127.0.0.1",
-        "gittodoc.com", "*.gittodoc.com", "www.gittodoc.com"
+        "gittodoc.com", "*.gittodoc.com", "www.gittodoc.com",
+        "gittodoc.onrender.com", "*.onrender.com"
     ]
     allowed_hosts = default_allowed_hosts
 
