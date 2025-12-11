@@ -69,8 +69,8 @@ async def process_catch_all(
     request: Request,
     input_text: str = Form(...),
     max_file_size: int = Form(...),
-    pattern_type: str = Form(...),
-    pattern: str = Form(...),
+    pattern_type: str = Form("exclude"),
+    pattern: str = Form(""),
 ) -> HTMLResponse:
     """
     Process the form submission with user input for query parameters.
