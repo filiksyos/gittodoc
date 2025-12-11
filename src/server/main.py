@@ -7,11 +7,13 @@ from typing import Dict
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from slowapi.errors import RateLimitExceeded
 from starlette.middleware.trustedhost import TrustedHostMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from server.routers import index, dynamic
 from server.server_config import templates
@@ -28,6 +30,49 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, rate_limit_exception_handler)
 
 
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """
+    Handle validation errors (422) with detailed logging for debugging.
+    
+    This helps diagnose environmental issues like missing form data or incorrect Content-Type headers.
+    """
+    # Log the error details for debugging
+    host = request.headers.get("host", "unknown")
+    content_type = request.headers.get("content-type", "unknown")
+    method = request.method
+    path = request.url.path
+    
+    error_details = {
+        "host": host,
+        "content_type": content_type,
+        "method": method,
+        "path": path,
+        "errors": exc.errors(),
+    }
+    
+    print(f"ERROR: 422 Validation Error - Host: {host}, Content-Type: {content_type}, Path: {path}")
+    print(f"ERROR: Validation details: {error_details}")
+    
+    # If it's a form submission, return a helpful error message
+    if method == "POST" and "form" in str(exc.errors()).lower():
+        return JSONResponse(
+            status_code=422,
+            content={
+                "detail": "Form validation failed. Make sure the request has Content-Type: application/x-www-form-urlencoded or multipart/form-data",
+                "host": host,
+                "content_type": content_type,
+                "errors": exc.errors(),
+            }
+        )
+    
+    # Otherwise return standard validation error
+    return JSONResponse(
+        status_code=422,
+        content={"detail": exc.errors(), "body": exc.body}
+    )
+
+
 # Mount static files dynamically to serve CSS, JS, and other static assets
 static_dir = Path(__file__).parent.parent / "static"
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
@@ -37,6 +82,8 @@ app.mount("/static", StaticFiles(directory=static_dir), name="static")
 allowed_hosts = os.getenv("ALLOWED_HOSTS")
 if allowed_hosts:
     allowed_hosts = allowed_hosts.split(",")
+    # Strip whitespace from each host
+    allowed_hosts = [host.strip() for host in allowed_hosts]
 else:
     # Define the default allowed hosts for the application
     default_allowed_hosts = [
@@ -46,7 +93,36 @@ else:
     ]
     allowed_hosts = default_allowed_hosts
 
+# Log allowed hosts for debugging (only in development)
+if os.getenv("DEBUG", "").lower() in ("true", "1"):
+    print(f"DEBUG: Allowed hosts: {allowed_hosts}")
+
+
+class RequestLoggingMiddleware(BaseHTTPMiddleware):
+    """Middleware to log request details for debugging 422 errors."""
+    
+    async def dispatch(self, request: Request, call_next):
+        # Log POST requests that might fail validation
+        if request.method == "POST":
+            host = request.headers.get("host", "unknown")
+            content_type = request.headers.get("content-type", "missing")
+            path = request.url.path
+            
+            # Only log if DEBUG is enabled or if content-type is suspicious
+            if os.getenv("DEBUG", "").lower() in ("true", "1") or not content_type.startswith(("application/x-www-form-urlencoded", "multipart/form-data")):
+                print(f"DEBUG POST: Host={host}, Content-Type={content_type}, Path={path}")
+        
+        response = await call_next(request)
+        return response
+
+
+# Add request logging middleware first (runs last in the chain)
+app.add_middleware(RequestLoggingMiddleware)
+
 # Add middleware to enforce allowed hosts
+# Note: TrustedHostMiddleware can cause 400 errors if Host header doesn't match
+# Make sure ALLOWED_HOSTS environment variable includes your actual domain
+# If you're behind a proxy, you may need to configure X-Forwarded-Host handling
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=allowed_hosts)
 
 
