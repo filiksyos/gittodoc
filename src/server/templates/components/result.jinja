@@ -85,6 +85,15 @@
                                 Copy Documentation Link
                             </button>
                         </div>
+                        {% if gitmvp_url %}
+                        <div class="relative inline-block group">
+                            <div class="w-full h-full rounded bg-gray-900 translate-y-1 translate-x-1 absolute inset-0"></div>
+                            <a href="{{ gitmvp_url }}" target="_blank" rel="noopener noreferrer"
+                               class="inline-flex items-center px-4 py-2 bg-[#a0e8a0] border-[3px] border-gray-900 text-gray-900 rounded group-hover:-translate-y-px group-hover:-translate-x-px transition-transform relative z-10">
+                                ✨ analyze repo
+                            </a>
+                        </div>
+                        {% endif %}
                     {% elif upload_failed %}
                          <p class="text-red-600 font-semibold">{{ error_message | default('Cloud upload failed.') }}</p>
                     {% elif content %}
