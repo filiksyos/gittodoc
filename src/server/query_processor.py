@@ -82,6 +82,7 @@ async def process_query(
         "content_url": None,
         "error_message": None,
         "upload_failed": False,
+        "gitmvp_url": None,
     }
 
     try:
@@ -137,12 +138,17 @@ async def process_query(
             )
         return template_response(context=context)
 
+    gitmvp_url = None
+    if query.user_name and query.repo_name:
+        gitmvp_url = f"https://gitmvp.com/{query.user_name}/{query.repo_name}"
+
     context.update(
         {
             "result": True,
             "summary": summary,
             "tree": tree,
             "ingest_id": query.id if 'query' in locals() and query else None,
+            "gitmvp_url": gitmvp_url,
         }
     )
 
