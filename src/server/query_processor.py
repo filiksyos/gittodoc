@@ -68,11 +68,10 @@ async def process_query(
         raise ValueError(f"Invalid pattern type: {pattern_type}")
 
     template = "index.jinja" if is_index else "git.jinja"
-    template_response = partial(templates.TemplateResponse, name=template)
+    template_response = partial(templates.TemplateResponse, request, template)
     max_file_size = log_slider_to_size(slider_position)
 
     context = {
-        "request": request,
         "repo_url": input_text,
         "examples": EXAMPLE_REPOS if is_index else [],
         "default_file_size": slider_position,
