@@ -52,9 +52,9 @@ async def catch_all(request: Request, full_path: str) -> HTMLResponse:
             loading = False
     # If not a valid repo path, just show the form with error (or fallback)
     return templates.TemplateResponse(
+        request,
         "git.jinja",
         {
-            "request": request,
             "repo_url": repo_url,
             "loading": loading,
             "default_file_size": 243,

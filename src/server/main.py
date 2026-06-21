@@ -170,7 +170,7 @@ async def api_docs(request: Request) -> HTMLResponse:
     HTMLResponse
         A rendered HTML page displaying API documentation.
     """
-    return templates.TemplateResponse("api.jinja", {"request": request})
+    return templates.TemplateResponse(request, "api.jinja", {})
 
 
 @app.get("/robots.txt")

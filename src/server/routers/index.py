@@ -30,9 +30,9 @@ async def home(request: Request) -> HTMLResponse:
         and other default parameters such as file size.
     """
     return templates.TemplateResponse(
+        request,
         "index.jinja",
         {
-            "request": request,
             "examples": EXAMPLE_REPOS,
             "default_file_size": 243,
         },
